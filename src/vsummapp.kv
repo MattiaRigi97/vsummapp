@@ -1,0 +1,702 @@
+#:kivy 2.0.0
+#:import Snackbar kivymd.uix.snackbar.Snackbar
+
+
+<ScreenLogin>:
+    name: "screenlogin"
+
+    FloatLayout:
+
+        MDTextField:
+            # Box to insert the username
+            id: user_login
+            hint_text: "Enter username"
+            pos_hint: {"center_y": .6, "center_x": .5}
+            size_hint_x: .4
+            mode: "rectangle"
+
+        MDRectangleFlatIconButton:
+			text: "Login"
+            icon: "login"
+            pos_hint: {"center_y": .5, "center_x": .5}
+			on_release: root.onEnter()
+
+
+<Home>:
+
+    name: "screenhome"
+
+    MDToolbar:
+        # Upper Bar
+        id: toolbar
+        pos_hint: {"top": 1}
+        elevation: 10
+        title: "Video2Summ"
+        # Open the menù
+        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+
+
+    MDNavigationLayout:
+
+        ScreenManager:
+            id: screen_manager
+
+            Screen:
+                name: "Home"
+                
+                MDRoundFlatIconButton:
+                    text: "Choose Video"
+                    icon: "folder"
+                    font_size: "20sp"
+                    pos_hint: {'center_x': .5, 'center_y': .8}
+                    on_release: root.gallery_manager_open()
+
+                MDIconButton:
+                    # Change the gallery default path
+                    icon: "folder-edit"
+                    user_font_size: "24sp"
+                    pos_hint: {'center_x': .35, 'center_y': .8}
+                    on_release: root.file_manager_gallery_open()
+
+                MDFillRoundFlatIconButton:
+                    # Open the video player
+                    text: "Play Video"
+                    icon: "video"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .5, "center_y": .7}
+                    on_release: root.onScreenVideo(self, 'screenvideo')
+
+                MDLabel:
+                    # Show the current path
+                    id: label_path_home
+                    halign: "center"
+                    pos_hint: {"center_x": .5, "center_y": .6}
+                    text: " "
+                
+                MDRectangleFlatButton:
+                    # Consider defualt quality
+                    text: "High Quality"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .4, "center_y": .5}
+                    on_press: root.set_options("High")  
+                
+                MDRectangleFlatButton:
+                    # /2
+                    text: "Medium Quality"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .4, "center_y": .4}
+                    on_press: root.set_options("Medium")   
+
+                MDRectangleFlatButton:
+                    # /4
+                    text: "Low Quality"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .4, "center_y": .3}
+                    on_press: root.set_options("Low")   
+                
+                MDRectangleFlatButton:
+                    # Duration constraint
+                    text: "Duration 20%"
+                    custom_color: 0, 1, 0, 1 
+                    pos_hint: {"center_x": .6, "center_y": .5}
+                    on_press: root.set_options("20%")   
+
+                MDRectangleFlatButton:
+                    # Duration constraint
+                    text: "Duration 15%"
+                    custom_color: 0, 1, 0, 1 
+                    pos_hint: {"center_x": .6, "center_y": .4} 
+                    on_press: root.set_options("15%")  
+
+                MDRectangleFlatButton:
+                    # Duration constraint
+                    text: "Duration 10%"
+                    custom_color: 0, 1, 0, 1 
+                    pos_hint: {"center_x": .6, "center_y": .3}
+                    on_press: root.set_options("10%")  
+
+                MDLabel:   
+                    # Show the quality selected
+                    id: my_quality_label
+                    text: "Low Quality"
+                    halign: "center"
+                    pos_hint: {"center_x": .4, "center_y": .2}  
+
+                MDLabel:
+                    # Show the duration constraint selected
+                    id: my_duration_label
+                    text: "15% Duration"
+                    halign: "center"
+                    pos_hint: {"center_x": .6, "center_y": .2}   
+
+                MDFillRoundFlatIconButton:
+                    # Call the algorithm
+                    text: "Summary"
+                    icon: "video"
+                    font_size: "20sp"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .4, "center_y": .1}
+                    on_press:
+                        root.make_summary()
+                        nav_drawer.set_state("close")
+                        screen_manager.current = "Gallery"   
+
+                MDFillRoundFlatIconButton:
+                    # Call the algorithm
+                    text: "Storyboard"
+                    icon: "image"
+                    font_size: "20sp"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .6, "center_y": .1}
+                    on_press:
+                        root.make_storyboard()
+                        nav_drawer.set_state("close")
+                        screen_manager.current = "Gallery"    
+
+                MDLabel:
+                    text: "Select a K"
+                    halign: "center"
+                    pos_hint: {"center_x": .8, "center_y": .05}
+
+                MDSlider:
+                    # Slider for select the K value
+                    id: select_k
+                    min: 1
+                    max: 15
+                    value: 9
+                    hint: True
+                    font_size: "16sp"
+                    pos_hint: {"center_x": .8, "center_y": .1}
+                    size_hint_x: .2
+                    color: app.theme_cls.accent_color
+                
+                MDIconButton:
+                    # INFO: Choose Video
+                    icon: "information-outline"
+                    user_font_size: "32sp"
+                    on_release: app.create_snackbar(text="Select the video that you want summarize ")
+                    pos_hint: {'center_x': .65, 'center_y': .8}
+               
+                MDIconButton:
+                    # INFO: Duration Setting
+                    icon: "information-variant"
+                    user_font_size: "24sp"
+                    on_release: app.show_app_duration_dialog()
+                    pos_hint: {"center_x": .7, "center_y": .2}   
+
+                MDIconButton:
+                    # INFO: Quality Setting
+                    icon: "information-variant"
+                    user_font_size: "24sp"
+                    on_release: app.show_app_quality_dialog()
+                    pos_hint: {"center_x": .3, "center_y": .2}   
+                
+                MDIconButton:
+                    # INFO: Select K
+                    icon: "information-variant"
+                    user_font_size: "24sp"
+                    on_release: app.show_app_k_dialog()
+                    pos_hint: {"center_x": .9, "center_y": .05}
+
+            Screen:
+                name: "Gallery"
+
+                MDRoundFlatIconButton:
+                    text: "Find Summary"
+                    font_size: "35sp"
+                    icon: "folder"
+                    pos_hint: {'center_x': .5, 'center_y': .7}
+                    on_release: root.summary_manager_open()
+
+                MDIconButton:
+                    # Change the summary default path
+                    icon: "folder-edit"
+                    user_font_size: "35sp"
+                    pos_hint: {'center_x': .3, 'center_y': .7}
+                    on_release: root.file_manager_summary_open()
+
+                MDLabel:
+                    # Show the current path
+                    id: label_path_summary
+                    halign: "center"
+                    pos_hint: {"center_x": .5, "center_y": .6}
+                    text: " "
+
+                MDFillRoundFlatIconButton:
+                    text: "Play Video"
+                    icon: "video"
+                    font_size: "20sp"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .35, "center_y": .4}   
+                    on_release: root.onScreenVideo(self, 'screenvideo')
+                
+                MDFillRoundFlatIconButton:
+                    text: "View Storyboard"
+                    icon: "image"
+                    font_size: "20sp"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .65, "center_y": .4}   
+                    on_release: root.onScreenGif(self, 'screengif')
+
+                MDIconButton:
+                    text: "Home"
+                    icon: "home"
+                    user_font_size: "64sp"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .5, "center_y": .1}   
+                    on_press: 
+                        nav_drawer.set_state("close")
+                        screen_manager.current = "Home"
+          
+
+            Screen:
+                name: "Annotate"
+
+                MDRoundFlatIconButton:
+                    text: "Choose Video"
+                    icon: "folder"
+                    font_size: "20sp"
+                    pos_hint: {'center_y': .7, 'center_x': .5}
+                    on_release: root.gallery_manager_open()
+
+                # MDLabel:
+                #    text: "Select maximum duration of a video to annotate"
+                #    halign: "center"
+                #    pos_hint: {"center_y": .7, "center_x": .5}
+
+                # MDSlider:
+                #    id: random_duration_slider
+                #    pos_hint: {"center_y": .6, "center_x": .5}
+                #    min: 1
+                #    max: 15
+                #    hint: True
+                #    size_hint_x: .5
+                #    color: app.theme_cls.accent_color
+    
+                MDRoundFlatIconButton:
+                    # Download one random video from the DB
+                    text: "Random Default Video"
+                    icon: "web"
+                    font_size: "20sp"
+                    pos_hint: {'center_y': .5, 'center_x': .5}
+                    on_release: root.choose_random_video()
+
+                MDFillRoundFlatIconButton:
+                    # Go to annotation screen
+                    text: "Annotate"
+                    icon: "pencil"
+                    font_size: "24sp"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_y": .3, 'center_x': .5}
+                    on_release: root.onAnnotationVideo(self, 'screenannotation')  
+
+                MDIconButton:
+                    text: "Home"
+                    icon: "home"
+                    user_font_size: "64sp"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .5, "center_y": .1}   
+                    on_press: 
+                        nav_drawer.set_state("close")
+                        screen_manager.current = "Home"
+
+                MDIconButton:
+                    # INFO: Choose Video
+                    icon: "information-outline"
+                    user_font_size: "35sp"
+                    on_release: app.create_snackbar(text="Select the video that you want annotate")
+                    pos_hint: {'center_y': .7, 'center_x': .7}
+
+                MDIconButton:
+                    # INFO: Random Default Video
+                    icon: "information-variant"
+                    user_font_size: "24sp"
+                    on_release: app.show_app_randomvideo_dialog()
+                    pos_hint: {'center_y': .5, 'center_x': .7}
+                
+
+            Screen:
+                name: "Preferences"
+
+                MDFillRoundFlatIconButton:
+                    text: "Show My Annotations"
+                    icon: "table"
+                    font_size: "24sp"
+                    pos_hint: {"center_x": .5, "center_y": .5}
+                    on_release: 
+                        root.onGetAnnotation(self, 'screengetannotation')
+
+                MDIconButton:
+                    text: "Home"
+                    icon: "home"
+                    user_font_size: "64sp"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .5, "center_y": .1}   
+                    on_press: 
+                        nav_drawer.set_state("close")
+                        screen_manager.current = "Home"  
+                
+            
+            Screen:
+                name: "Model"
+
+                MDLabel:
+                    text: "Model"
+                    halign: "center"
+                
+                MDIconButton:
+                    text: "Home"
+                    icon: "home"
+                    user_font_size: "64sp"
+                    custom_color: 0, 1, 0, 1
+                    pos_hint: {"center_x": .5, "center_y": .1}   
+                    on_press: 
+                        nav_drawer.set_state("close")
+                        screen_manager.current = "Home"  
+
+
+            Screen:
+                name: "Settings"
+
+                MDLabel:
+                    text: "Settings"
+                    halign: "center"
+
+                FloatLayout:
+
+                    MDRaisedButton:
+                        # Change the Theme Color
+                        text: "Change Theme Color"
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        font_size: "32sp"
+                        size_hint: .7,.7
+                        on_release: app.show_theme_picker()
+
+        MDNavigationDrawer:
+            id: nav_drawer
+
+            ContentNavigationDrawer:
+                screen_manager: screen_manager
+                nav_drawer: nav_drawer
+
+
+<ContentNavigationDrawer>:
+
+    ScrollView:
+
+        MDList:
+
+            # Left Menù; list of pages
+            # When clicked, you will go to the screen
+
+            OneLineAvatarListItem:
+                text: "Home"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    root.screen_manager.current = "Home"
+                IconLeftWidget:
+                    icon: "home"
+
+            OneLineAvatarListItem:
+                text: "Gallery"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    root.screen_manager.current = "Gallery"
+                IconLeftWidget:
+                    icon: "folder-multiple-image"
+
+            OneLineAvatarListItem:
+                text: "Annotate"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    root.screen_manager.current = "Annotate"
+                IconLeftWidget:
+                    icon: "pencil"
+
+            OneLineAvatarListItem:
+                text: "Preferences"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    root.screen_manager.current = "Preferences"
+                IconLeftWidget:
+                    icon: "account-settings"
+
+            OneLineAvatarListItem:
+                text: "Model"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    root.screen_manager.current = "Model"
+                IconLeftWidget:
+                    icon: "brain"
+
+            OneLineAvatarListItem:
+                text: "Settings"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    root.screen_manager.current = "Settings"
+                IconLeftWidget:
+                    icon: "account-settings"
+
+            OneLineAvatarListItem:
+                text: "Info App"
+                on_press: root.show_app_info_dialog()
+                IconLeftWidget:
+                    icon: "information-outline"
+
+            OneLineAvatarListItem:
+                text: "Contact"
+                on_press: root.show_contact_info_dialog()
+                IconLeftWidget:
+                    icon: "email-outline"
+
+
+<ScreenVideo>:
+    name: "screenvideo"
+    GridLayout:
+        name: "ScreenGrid"
+        pos_hint: {'top': 1}
+        cols:1
+        rows:2
+
+        ActionBar:
+            pos_hint: {'top': 1}
+            height:'100sp'
+            ActionView:
+                ActionPrevious:
+                    with_previous: True
+                    on_release: root.onBackBtn()
+
+
+<ScreenAnnotation>:
+    name: "screenannotation"
+    
+    ActionBar:
+        pos_hint: {'top': 1}
+        height:'100sp'
+        ActionView:
+            ActionPrevious:
+                with_previous: True
+                on_release: root.onBackBtn()
+
+    MDLabel:
+        # % of coverage of the segments in the annotation box
+        id: my_label
+        text: "0% Progress"
+        halign: "center"
+        pos_hint: {"center_y": .85, "center_x": .5}
+
+    MDProgressBar:
+        id: my_progress_bar
+        pos_hint: {"center_y": .8, "center_x": .5}
+        min: 0
+        max: 100
+        size_hint_x: .8
+    
+    MDTextField:
+        # Annotation box that can be compiled manually or with "start", "end" and "add segment" buttons
+        id : annotation
+        hint_text: "Write your annotation here"
+        helper_text: "Add manually a segment (es. 10.0, 12.0)"
+        pos_hint: {"center_y": .5, "center_x": .8}
+        size_hint_x: .3
+        icon_right: "pencil-outline"
+        multiline: True
+        mode: "rectangle"
+        color_mode: 'accent'
+        helper_text_mode: "persistent"
+
+    MDLabel:
+        # Show the current start point
+        id: label_start
+        halign: "center"
+        pos_hint: {"center_y": .2, "center_x": .1}
+        text: " "
+        color_mode: 'accent'
+
+    MDLabel:
+        # Show the current end point
+        id: label_end
+        halign: "center"
+        pos_hint: {"center_y": .2, "center_x": .5}
+        text: " "
+        color_mode: 'accent'
+
+    MDFillRoundFlatIconButton:
+        # Update the progress bar with the segments in the annotation box
+        text: "Control"
+        pos_hint: {"center_y": .7, "center_x": .8}
+        icon: "alert-circle-check"
+        on_press: root.update_selection()
+
+    MDRectangleFlatIconButton:
+        # Upload annotation (and video if it's of the user) to the DB
+        text: "Save"
+        icon: "content-save-edit"
+        pos_hint: {"center_y": .2, "center_x": .8}
+        on_press: root.create_patch()
+
+    MDRectangleFlatIconButton:
+        # Delete the current video from the gallery of the device
+        text: "Delete Video"
+        icon: "delete"
+        pos_hint: {"center_y": .1, "center_x": .8}
+        on_press: root.delete_video_from_gallery()
+
+    #MDRectangleFlatIconButton:
+    #	text: "Delete"
+    #    icon: "delete"
+    #    pos_hint: {"center_y": .2, "center_x": .9}
+    #	on_press: root.delete_data()
+
+    #MDRectangleFlatIconButton:
+    #	text: "Upload Video"
+    #    icon: "cloud-upload"
+    #    pos_hint: {"center_y": .1, "center_x": .8}
+    #	on_press: root.upload_video()
+
+    MDFillRoundFlatIconButton:
+        # INFO: Start Button
+        text: "Start"
+        icon: "ray-start"
+        pos_hint: {"center_y": .2, "center_x": .2}
+        on_press: root.get_time_position_start()
+    
+    MDFillRoundFlatIconButton:
+        # INFO: End Button
+        text: "End"
+        icon: "ray-end"
+        pos_hint: {"center_y": .2, "center_x": .4}
+        on_press: root.get_time_position_end()
+
+    MDFillRoundFlatIconButton:
+        # INFO: Add Segment Button
+        text: "Add Segment"
+        icon: "tray-plus"
+        pos_hint: {"center_y": .1, "center_x": .3}
+        on_press: root.add_segment()
+
+    MDIconButton:
+        # INFO: Control Button
+        icon: "information-outline"
+        user_font_size: "32sp"
+        on_release: app.create_snackbar(text="Control the coverage of your annotation")
+        pos_hint: {"center_y": .7, "center_x": .9}
+
+    MDIconButton:
+        # INFO: Save Button
+        icon: "information-outline"
+        user_font_size: "32sp"
+        on_release: app.create_snackbar(text="Save annotation and video (if it's your) on DB")
+        pos_hint: {"center_y": .2, "center_x": .9}
+
+    MDIconButton:
+        # # INFO: General Annotation Info
+        icon: "information-variant"
+        user_font_size: "24sp"
+        on_release: app.show_app_annotation_dialog()
+        pos_hint: {"center_y": .15, "center_x": .1}
+
+
+<GetAnnotation>:
+    name: "screengetannotation"
+
+    FloatLayout:
+
+        ActionBar:
+            pos_hint: {'top': 1}
+            height:'100sp'
+            ActionView:
+                ActionPrevious:
+                    with_previous: True
+                    on_release: root.onBackBtn()
+    
+        MDFillRoundFlatIconButton:
+            # Delete the annotation from the DB
+            text: "Remove"
+            icon: "remove"
+            pos_hint: {'center_x': .6, 'center_y': .1}
+            on_release: root.removeSelectedRows()
+
+        MDFillRoundFlatIconButton:
+            # Show the segments (start, end), in second, for the selected annotation
+            text: "Show Annotation"
+            icon: "pencil"
+            pos_hint: {'center_x': .4, 'center_y': .1}
+            on_release: root.show_annotation_dialog()
+
+
+<ScreenGif>:
+    name: "screengif"
+
+    FloatLayout:
+
+        ActionBar:
+            pos_hint: {'top': 1}
+            height:'100sp'
+            ActionView:
+                ActionPrevious:
+                    with_previous: True
+                    on_release: root.onBackBtn()
+        
+        MDRaisedButton:
+            # Press to start the GIF animation
+            text: " "
+            pos_hint: {'center_x': .5, 'center_y': .5}  
+            size_hint: .7,.7
+            on_press: gif.anim_delay = 0.5
+            on_press: gif._coreimage.anim_reset(True)
+
+            Image:
+                id: gif
+                source: " "
+                pos_hint: {"center_y": .5, "center_x": .5}
+                #size: 500, 500
+                allow_stretch: True
+                anim_delay: -1
+                anim_loop: 1
+
+<Manager>:
+    id: screen_manager
+    screen_login: screen_login
+    screen_home: screen_home
+    screen_video: screen_video
+    screen_annotation: screen_annotation
+    screen_get_annotation: screen_get_annotation
+    screen_gif: screen_gif
+
+    ScreenLogin:
+        id: screen_login
+        name: 'screenlogin'
+        manager: screen_manager
+
+    Home:
+        id: screen_home
+        name: 'screenhome'
+        manager: screen_manager
+
+    ScreenVideo:
+        id: screen_video
+        name: 'screenvideo'
+        manager: screen_manager
+
+    ScreenAnnotation:
+        id: screen_annotation
+        name: 'screenannotation'
+        manager: screen_manager
+    
+    GetAnnotation:
+        id: screen_get_annotation
+        name: 'screengetannotation'
+        manager: screen_manager
+    
+    ScreenGif:
+        id: screen_gif
+        name: 'screengif'
+        manager: screen_manager
+
+
+<VideoPlayer>:
+    options: {'eos': 'loop'}
+    allow_stretch:True
+
+

@@ -1,0 +1,35 @@
+anchor_scales:
+- 4
+- 8
+- 16
+- 32
+base_model: attention
+cls_loss: focal
+cnn: mobilenet
+device: cuda
+incomplete_iou_thresh: 0.3
+incomplete_sample_ratio: 1.0
+lambda_ctr: 1.0
+lambda_reg: 1.0
+log_file: log.txt
+lr: 5.0e-05
+max_epoch: 50
+model: anchor-based
+model_dir: ../models/ab_mobilenet
+neg_iou_thresh: 0.0
+neg_sample_ratio: 2.0
+nms_thresh: 0.5
+num_feature: 1280
+num_head: 10
+num_hidden: 128
+output_path: C:\Users\matti\github\DSNet\output_video
+pos_iou_thresh: 0.6
+reg_loss: soft-iou
+seed: 12345
+segment_algo: kts
+splits:
+- ../splits/tvsum.yml
+- ../splits/summe.yml
+video_name: _xMr-HKMfVA.mp4
+video_path: ../video
+weight_decay: 1.0e-05
